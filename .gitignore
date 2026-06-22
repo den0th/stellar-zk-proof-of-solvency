@@ -10,4 +10,10 @@ target
 circuits/build/
 circuits/node_modules/
 
+# Web app build output / deps (the app + the served wasm/zkey in web/public ARE tracked).
+web/node_modules/
+web/dist/
+web/contract-client/node_modules/
+web/contract-client/dist/
+
 .DS_Store
