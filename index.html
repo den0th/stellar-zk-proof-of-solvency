@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZK Proof-of-Solvency on Stellar</title>
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+        background: #0b0e14; color: #e6e6e6; line-height: 1.5;
+      }
+      main { max-width: 640px; margin: 0 auto; padding: 40px 20px 80px; }
+      h1 { font-size: 1.7rem; margin: 0 0 6px; }
+      .sub { color: #9aa4b2; margin: 0 0 24px; }
+      .card { background: #141925; border: 1px solid #232a39; border-radius: 14px; padding: 20px; margin: 16px 0; }
+      h2 { font-size: 0.95rem; text-transform: uppercase; letter-spacing: .05em; color: #9aa4b2; margin: 0 0 12px; }
+      .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+      input {
+        width: 100%; padding: 10px; background: #0b0e14; border: 1px solid #2a3242;
+        border-radius: 8px; color: #e6e6e6; font-size: 0.95rem;
+      }
+      label { display: block; margin-top: 14px; color: #9aa4b2; font-size: 0.9rem; }
+      button {
+        width: 100%; padding: 13px; margin-top: 8px; border: 0; border-radius: 10px;
+        font-size: 1rem; font-weight: 600; cursor: pointer;
+        background: linear-gradient(180deg, #4f7cff, #3a63e0); color: #fff;
+      }
+      button:disabled { opacity: .5; cursor: default; }
+      #connect { background: #232a39; }
+      #status { min-height: 1.4em; color: #c8d0dc; margin: 14px 0 0; }
+      #result { color: #7ee787; margin: 6px 0 0; }
+      code { background: #0b0e14; padding: 2px 6px; border-radius: 5px; color: #9ecbff; }
+      a { color: #7aa2ff; }
+      footer { color: #6b7585; font-size: 0.8rem; margin-top: 28px; }
+    </style>
+    <script type="module" crossorigin src="./assets/index-1qx50LHe.js"></script>
+  </head>
+  <body>
+    <main>
+      <h1>ZK Proof-of-Solvency</h1>
+      <p class="sub">
+        Prove your total liabilities are within a public threshold T,
+        <strong>without revealing any individual balance</strong>. The proof is generated
+        in your browser (balances never leave this page) and verified by a Soroban contract
+        on Stellar testnet.
+      </p>
+
+      <div class="card">
+        <h2>Your 8 private balances</h2>
+        <div class="grid" id="balances"></div>
+        <label>Public solvency threshold T</label>
+        <input id="threshold" value="100" inputmode="numeric" />
+      </div>
+
+      <button id="connect">Connect Freighter (testnet)</button>
+      <button id="attest" disabled>Generate proof + attest on-chain</button>
+
+      <p id="status"></p>
+      <p id="result"></p>
+
+      <footer>
+        Demo: synthetic balances, toy trusted setup, asset side attested. Unaudited.
+        <a id="repo" target="_blank" href="https://github.com/den0th/stellar-zk-proof-of-solvency">source</a>
+      </footer>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,19 @@
+# Rust's output directory
+target
+
+# Local settings
+.soroban
+.stellar
+
+# Generated ZK artifacts (regenerable via circuits/build.sh). The PINNED proof/vk/public
+# used by the contract test live in contracts/groth16-verifier/data/solvency/ and ARE tracked.
+circuits/build/
+circuits/node_modules/
+
+# Web app build output / deps (the app + the served wasm/zkey in web/public ARE tracked).
+web/node_modules/
+web/dist/
+web/contract-client/node_modules/
+web/contract-client/dist/
+
+.DS_Store
