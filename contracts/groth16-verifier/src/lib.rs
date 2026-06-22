@@ -12,6 +12,7 @@ pub enum Groth16Error {
     MalformedVerifyingKey = 0,
     VkNotSet = 1,
     VerificationFailed = 2,
+    VkAlreadySet = 3,
 }
 
 #[derive(Clone)]
@@ -92,15 +93,27 @@ impl Groth16Verifier {
         Ok(bls.pairing_check(vp1, vp2))
     }
 
-    // Store the verification key once (deploy-time). Kept simple for the demo (no admin gate):
-    // a production version would require an admin Address with require_auth().
-    pub fn set_vk(env: Env, vk: VerificationKey) {
+    // Store the verification key ONCE (immutable). The vk is a fixed constant of the circuit;
+    // it must never change after deploy. Set-once closes the "anyone overwrites the vk and forges
+    // a Solvent attestation against their own vk" attack without needing an admin address.
+    // (A multi-vk / upgradeable design would instead gate this on an admin Address require_auth().)
+    pub fn set_vk(env: Env, vk: VerificationKey) -> Result<(), Groth16Error> {
+        if env.storage().instance().has(&DataKey::Vk) {
+            return Err(Groth16Error::VkAlreadySet);
+        }
         env.storage().instance().set(&DataKey::Vk, &vk);
+        Ok(())
     }
 
     // Verify a solvency proof against the stored vk and, IFF it verifies, record a timestamped
     // attestation and emit an event. A failing proof reverts (VerificationFailed) and writes nothing.
     // pub_signals = [rootHash, threshold] (snarkjs order: public output then public input).
+    //
+    // Authorization model (by design): the PROOF is the authorization. Anyone holding a valid proof
+    // may record the public-good fact "this committed balance set is solvent under threshold T"; you
+    // cannot record a false solvency claim without a verifying proof. Replaying the same proof only
+    // appends a duplicate timestamped record (harmless). A submitter-bound / nonce'd variant
+    // (require_auth + identity in the public inputs) is future work, not needed for this public good.
     pub fn verify_and_attest(
         env: Env,
         proof: Proof,
@@ -120,7 +133,9 @@ impl Groth16Verifier {
         let root_hash = pub_signals.get(0).ok_or(Groth16Error::MalformedVerifyingKey)?;
         let threshold = pub_signals.get(1).ok_or(Groth16Error::MalformedVerifyingKey)?;
 
-        let count: u32 = env.storage().instance().get(&DataKey::Count).unwrap_or(0);
+        // The counter lives in the SAME (persistent) tier as the records it indexes, so the id
+        // cannot collide with a previously-written Attestation if instance state were evicted.
+        let count: u32 = env.storage().persistent().get(&DataKey::Count).unwrap_or(0);
         let att = Attestation {
             id: count,
             root_hash,
@@ -131,7 +146,7 @@ impl Groth16Verifier {
         env.storage()
             .persistent()
             .set(&DataKey::Attestation(count), &att);
-        env.storage().instance().set(&DataKey::Count, &(count + 1));
+        env.storage().persistent().set(&DataKey::Count, &(count + 1));
         env.events()
             .publish((symbol_short!("solvency"), symbol_short!("attest")), att.clone());
         Ok(att)
@@ -142,7 +157,7 @@ impl Groth16Verifier {
     }
 
     pub fn latest(env: Env) -> Option<Attestation> {
-        let count: u32 = env.storage().instance().get(&DataKey::Count).unwrap_or(0);
+        let count: u32 = env.storage().persistent().get(&DataKey::Count).unwrap_or(0);
         if count == 0 {
             return None;
         }

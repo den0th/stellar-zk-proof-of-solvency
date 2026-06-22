@@ -8,6 +8,16 @@ Post-FTX, exchanges and stablecoin/RWA issuers are expected to prove reserves co
 that publicly leaks every customer's balance. This shows the privacy-preserving alternative, verified by a
 Soroban smart contract on Stellar.
 
+## Live on Stellar testnet
+
+Deployed and exercised end-to-end on Stellar testnet (a real ZK solvency proof verified on-chain):
+
+- Contract: `CDCNXZ7JGDBOFEYM44GX2OA6L7ULMW4D2JDY5SCCNS4LO6VW7SOKBZQQ`
+- `verify_and_attest` tx (proof verified, attestation recorded, `(solvency, attest)` event emitted):
+  https://stellar.expert/explorer/testnet/tx/59a55bc8a8f99d1afd38cebb2b9a23cc0b0c9308942799e951e0895970d763b3
+- `set_vk` tx: https://stellar.expert/explorer/testnet/tx/333e097732e1715f49991f9d9bc4494dc245c8b412436209ec4413b9f5bbd384
+- Recorded attestation (`latest`): `{ id: 0, root_hash: 20329...341317, threshold: 100, status: Solvent }`
+
 ## Why the ZK is load-bearing
 
 A plain Merkle-sum proof leaks sibling balances and partial sums. Here the SNARK proves, over data the
