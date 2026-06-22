@@ -1,0 +1,26 @@
+[package]
+name = "groth16-verifier"
+version = "0.0.0"
+edition = "2021"
+publish = false
+rust-version = "1.89.0"
+
+# Adapted from stellar/soroban-examples/groth16_verifier (official, BLS12-381).
+# Changes from upstream: soroban-sdk pinned via the workspace (26 instead of 25.1.0);
+# crate-type matches this repo's hello-world (["lib","cdylib"]); profiles + rust-toolchain
+# are owned by the workspace root, not this member. Upstream is "demonstration only, not audited".
+
+[lib]
+crate-type = ["lib", "cdylib"]
+doctest = false
+
+[dependencies]
+soroban-sdk = { workspace = true }
+
+[dev-dependencies]
+soroban-sdk = { workspace = true, features = ["testutils"] }
+ark-bls12-381 = "0.4.0"
+ark-serialize = "0.4.2"
+ark-ff = "0.4.2"
+ark-ec = "0.4.2"
+serde_json = "1"
